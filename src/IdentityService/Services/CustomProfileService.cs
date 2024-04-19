@@ -19,15 +19,22 @@ public class CustomProfileService : IProfileService
     public async Task GetProfileDataAsync(ProfileDataRequestContext context)
     {
         var user = await _userManager.GetUserAsync(context.Subject);
-        var existingClaims = await _userManager.GetClaimsAsync(user);   
-
-        var claims = new List<Claim>
+        if (user != null)
         {
-            new Claim("username", user.UserName)
-        };
-
-        context.IssuedClaims.AddRange(claims);
-        context.IssuedClaims.Add(existingClaims.FirstOrDefault(x => x.Type == JwtClaimTypes.Name));
+            var existingClaims = await _userManager.GetClaimsAsync(user);   
+            if (user.UserName != null)
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim("username", user.UserName)
+                };
+                
+                context.IssuedClaims.AddRange(claims);
+                var match = existingClaims.FirstOrDefault(x => x.Type == JwtClaimTypes.Name);
+                if (match != null)
+                    context.IssuedClaims.Add(match);
+            }
+        }
     }
 
     public Task IsActiveAsync(IsActiveContext context)

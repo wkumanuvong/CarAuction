@@ -25,7 +25,7 @@ namespace IdentityService.Pages.Register
         [BindProperty]
         public bool RegisterSuccess { get; set; }
 
-        public IActionResult OnGet(string returnUrl)
+        public IActionResult OnGet(string? returnUrl)
         {
             Input = new RegisterViewModel
             {
@@ -48,13 +48,13 @@ namespace IdentityService.Pages.Register
                     EmailConfirmed = true
                 };
 
-                var result = await _userManager.CreateAsync(user, Input.Password);
+                var result = await _userManager.CreateAsync(user, Input.Password!);
 
                 if (result.Succeeded)
                 {
                     await _userManager.AddClaimsAsync(user, new Claim[]
                     {
-                        new Claim(JwtClaimTypes.Name, Input.FullName)
+                        new Claim(JwtClaimTypes.Name, Input.FullName!)
                     });
 
                     RegisterSuccess = true;
