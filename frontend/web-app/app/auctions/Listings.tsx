@@ -49,7 +49,7 @@ export default function Listings() {
       setData(data);
       setLoading(false);
     });
-  }, [url]);
+  }, [url, setData]);
 
   if (loading) return <h3>Loading...</h3>;
 
@@ -60,12 +60,12 @@ export default function Listings() {
         <EmptyFilter showReset />
       ) : (
         <>
-          <div className="grid grid-cols-4 gap-6">
+          <div className='grid grid-cols-4 gap-6'>
             {data.auctions.map((auction) => (
               <AuctionCard auction={auction} key={auction.id} />
             ))}
           </div>
-          <div className="flex justify-center mt-4">
+          <div className='flex justify-center mt-4'>
             <AppPagination
               pageChanged={setPageNumber}
               currentPage={params.pageNumber}

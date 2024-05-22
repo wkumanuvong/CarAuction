@@ -20,15 +20,19 @@ export default function SignalRProvider({ children, user }: Props) {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const setCurrentPrice = useAuctionStore((state) => state.setCurrentPrice);
   const addBid = useBidStore((state) => state.addBid);
+  const apiUrl =
+    process.env.NODE_ENV === 'production'
+      ? 'https://api.carauction.com/notifications'
+      : process.env.NEXT_PUBLIC_NOTIFY_URL;
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
-      .withUrl('http://localhost:6001/notifications')
+      .withUrl(apiUrl!)
       .withAutomaticReconnect()
       .build();
 
     setConnection(newConnection);
-  }, []);
+  }, [apiUrl]);
 
   useEffect(() => {
     if (connection) {
@@ -47,7 +51,7 @@ export default function SignalRProvider({ children, user }: Props) {
           connection.on('AuctionCreated', (auction: Auction) => {
             if (user?.username !== auction.seller) {
               return toast(<AuctionCreatedToast auction={auction} />, {
-                duration: 10000
+                duration: 10000,
               });
             }
           });
@@ -66,7 +70,7 @@ export default function SignalRProvider({ children, user }: Props) {
                       auction={auction}
                     />
                   ),
-                  error: (err) => 'Auction finished!'
+                  error: (err) => 'Auction finished!',
                 },
                 { success: { duration: 10000, icon: null } }
               );
@@ -79,7 +83,7 @@ export default function SignalRProvider({ children, user }: Props) {
     return () => {
       connection?.stop();
     };
-  }, [connection, setCurrentPrice]);
+  }, [connection, setCurrentPrice, addBid, user?.username]);
 
   return children;
 }

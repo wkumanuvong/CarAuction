@@ -1,14 +1,1 @@
-{
-  "plugins": ["@typescript-eslint", "prettier"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "next/babel",
-    "next/core-web-vitals"
-  ],
-  "rules": {
-    "prettier/prettier": ["error", { "singleQuote": true }]
-  }
-}
+{ "extends": "next" }
