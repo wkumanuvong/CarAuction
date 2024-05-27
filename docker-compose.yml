@@ -148,6 +148,7 @@ services:
       - id.carauction.com:10.5.0.200
     environment:
       - NEXTAUTH_SECRET=somethingreallyreallysecret
+      - CLIENT_SECRET=secret
       - NEXTAUTH_URL=http://app.carauction.com
       - NEXTAUTH_URL_INTERNAL=http://web-app:3000
       - API_URL=http://gateway-svc/

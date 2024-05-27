@@ -20,10 +20,6 @@ const config: Config = {
   corePlugin: {
     aspectRatio: false,
   },
-  plugins: 
-  [
-    require('@tailwindcss/aspect-ratio'),
-    flowbite.plugin(),
-  ],  
+  plugins: [require('@tailwindcss/aspect-ratio'), flowbite.plugin()],
 };
 export default config;

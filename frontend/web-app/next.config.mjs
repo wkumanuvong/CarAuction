@@ -5,9 +5,9 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'cdn.pixabay.com',
-        pathname: '**'
-      }
-    ]
+        pathname: '**',
+      },
+    ],
   },
   output: 'standalone',
 };
