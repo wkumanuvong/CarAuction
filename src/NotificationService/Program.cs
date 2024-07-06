@@ -9,6 +9,13 @@ builder.Services.AddMassTransit(x =>
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("nt", false));
     x.UsingRabbitMq((context, cfg) =>
     {
+        // add retry for RabbitMq
+        cfg.UseMessageRetry(r =>
+        {
+            r.Handle<RabbitMqConnectionException>();
+            r.Interval(5, TimeSpan.FromSeconds(10));
+        });
+
         cfg.UseMessageRetry(r =>
         {
             r.Handle<RabbitMqConnectionException>();

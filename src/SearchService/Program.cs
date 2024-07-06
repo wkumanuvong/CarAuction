@@ -20,6 +20,7 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
+        // add retry for RabbitMq
         cfg.UseMessageRetry(r =>
         {
             r.Handle<RabbitMqConnectionException>();
@@ -55,7 +56,7 @@ app.Lifetime.ApplicationStarted.Register(async () =>
 {
     await Policy.Handle<TimeoutException>()
         .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(10))
-        .ExecuteAndCaptureAsync(async () =>  await DbInitializer.InitDb(app));    
+        .ExecuteAndCaptureAsync(async () => await DbInitializer.InitDb(app));
 });
 
 app.Run();

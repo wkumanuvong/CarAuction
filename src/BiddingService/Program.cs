@@ -1,5 +1,4 @@
 using BiddingService;
-using Contracts;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MongoDB.Driver;
@@ -11,13 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddMassTransit(x => 
+builder.Services.AddMassTransit(x =>
 {
     x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("bids", false));
-    x.UsingRabbitMq((context, cfg) => 
+    x.UsingRabbitMq((context, cfg) =>
     {
-         cfg.UseMessageRetry(r =>
+        // add retry for RabbitMq
+        cfg.UseMessageRetry(r =>
         {
             r.Handle<RabbitMqConnectionException>();
             r.Interval(5, TimeSpan.FromSeconds(10));
@@ -33,7 +33,7 @@ builder.Services.AddMassTransit(x =>
     });
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options => 
+    .AddJwtBearer(options =>
     {
         options.Authority = builder.Configuration["IdentityServiceUrl"];
         options.RequireHttpsMetadata = false;
