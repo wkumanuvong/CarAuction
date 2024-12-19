@@ -2,41 +2,37 @@
 
 import React, { useEffect, useState } from 'react';
 import AuctionCard from './AuctionCard';
-import { Auction, PagedResult } from '@/types';
 import AppPagination from '../components/AppPagination';
 import { getData } from '../actions/auctionActions';
 import Filters from './Filters';
 import { useParamsStore } from '@/hooks/useParamsStore';
-import { shallow } from 'zustand/shallow';
-import qs from 'query-string';
 import EmptyFilter from '../components/EmptyFilter';
+import qs from 'query-string';
 import { useAuctionStore } from '@/hooks/useAuctionStore';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function Listings() {
   const [loading, setLoading] = useState(true);
   const params = useParamsStore(
-    (state) => ({
+    useShallow((state) => ({
       pageNumber: state.pageNumber,
       pageSize: state.pageSize,
       searchTerm: state.searchTerm,
       orderBy: state.orderBy,
       filterBy: state.filterBy,
       seller: state.seller,
-      winner: state.winner
-    }),
-    shallow
+      winner: state.winner,
+    }))
   );
   const data = useAuctionStore(
-    (state) => ({
+    useShallow((state) => ({
       auctions: state.auctions,
       totalCount: state.totalCount,
-      pageCount: state.pageCount
-    }),
-    shallow
+      pageCount: state.pageCount,
+    }))
   );
 
   const setData = useAuctionStore((state) => state.setData);
-
   const setParams = useParamsStore((state) => state.setParams);
   const url = qs.stringifyUrl({ url: '', query: params });
 

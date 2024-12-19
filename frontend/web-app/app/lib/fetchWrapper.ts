@@ -1,11 +1,11 @@
-import { getTokenWorkaround } from '@/app/actions/authActions';
+import { auth } from '@/auth';
 
 const baseUrl = process.env.API_URL;
 
 async function get(url: string) {
   const requestOptions = {
     method: 'GET',
-    header: await getHeaders()
+    header: await getHeaders(),
   };
 
   const response = await fetch(baseUrl + url, requestOptions);
@@ -16,7 +16,7 @@ async function post(url: string, body: {}) {
   const requestOptions = {
     method: 'POST',
     headers: await getHeaders(),
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   };
   const response = await fetch(baseUrl + url, requestOptions);
   return await handleResponse(response);
@@ -26,7 +26,7 @@ async function put(url: string, body: {}) {
   const requestOptions = {
     method: 'PUT',
     headers: await getHeaders(),
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   };
   const response = await fetch(baseUrl + url, requestOptions);
   return await handleResponse(response);
@@ -35,17 +35,17 @@ async function put(url: string, body: {}) {
 async function del(url: string) {
   const requestOptions = {
     method: 'DELETE',
-    headers: await getHeaders()
+    headers: await getHeaders(),
   };
   const response = await fetch(baseUrl + url, requestOptions);
   return await handleResponse(response);
 }
 
 async function getHeaders() {
-  const token = await getTokenWorkaround();
+  const session = await auth();
   const headers = { 'Content-type': 'application/json' } as any;
-  if (token) {
-    headers.Authorization = 'Bearer ' + token.access_token;
+  if (session?.accessToken) {
+    headers.Authorization = 'Bearer ' + session.accessToken;
   }
   return headers;
 }
@@ -64,7 +64,7 @@ async function handleResponse(response: Response) {
   } else {
     const error = {
       status: response.status,
-      message: typeof data === 'string' ? data : response.statusText
+      message: typeof data === 'string' ? data : response.statusText,
     };
     console.log(error);
     return { error };
@@ -75,5 +75,5 @@ export const fetchWrapper = {
   get,
   post,
   put,
-  del
+  del,
 };

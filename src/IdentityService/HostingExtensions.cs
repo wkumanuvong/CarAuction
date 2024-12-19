@@ -1,4 +1,5 @@
 using Duende.IdentityServer;
+using Duende.IdentityServer.Services;
 using IdentityService.Data;
 using IdentityService.Models;
 using Microsoft.AspNetCore.Identity;
@@ -27,11 +28,12 @@ internal static class HostingExtensions
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
+                options.IssuerUri = builder.Configuration["IssuerUri"];
 
-                if (builder.Environment.IsEnvironment("Docker"))
-                {
-                    options.IssuerUri = "identity-svc";
-                }
+                // if (builder.Environment.IsProduction())
+                // {
+                //     options.IssuerUri = "https://id.trycatchlearn.com";
+                // }
 
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 // options.EmitStaticAudienceClaim = true;
@@ -43,6 +45,11 @@ internal static class HostingExtensions
             .AddProfileService<CustomProfileService>();
 
         builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
+
+        builder.Services.ConfigureExternalCookie(options =>
         {
             options.Cookie.SameSite = SameSiteMode.Lax;
         });
@@ -63,6 +70,17 @@ internal static class HostingExtensions
 
         app.UseStaticFiles(); // return HTML, CSS, JavaScript
         app.UseRouting();
+
+        // if (app.Environment.IsProduction())
+        // {
+        //     app.Use(async (ctx, next) =>
+        //     {
+        //         var serverUrls = ctx.RequestServices.GetRequiredService<IServerUrls>();
+        //         serverUrls.Origin = serverUrls.Origin = "https://id.trycatchlearn.com";
+        //         await next();
+        //     });
+        // }
+
         app.UseIdentityServer();
         app.UseAuthorization();
 

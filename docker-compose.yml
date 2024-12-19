@@ -1,8 +1,8 @@
-networks:
-  custom:
-    ipam:
-      config:
-        - subnet: 10.5.0.0/16
+# networks:
+#   custom:
+#     ipam:
+#       config:
+#         - subnet: 10.5.0.0/16
 
 services:
   postgres:
@@ -13,8 +13,8 @@ services:
       - 5432:5432
     volumes:
       - /var/lib/postgresql/data
-    networks:
-      custom:
+    # networks:
+    #   custom:
   mongodb:
     image: mongo
     environment:
@@ -23,16 +23,17 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - /var/lib/mongodb/data
-    networks:
-      custom:
+      - /data/db
+    # networks:
+    #   custom:
   rabbitmq:
     image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
     ports:
       - 5672:5672
       - 15672:15672
-    networks:
-      custom:
+    # networks:
+    #   custom:
   auction-svc:
     image: wkumanuvong/auction-svc:latest
     build:
@@ -55,8 +56,8 @@ services:
     depends_on:
       - postgres
       - rabbitmq
-    networks:
-      custom:
+    # networks:
+    #   custom:
   search-svc:
     image: wkumanuvong/search-svc:latest
     build:
@@ -73,8 +74,8 @@ services:
     depends_on:
       - mongodb
       - rabbitmq
-    networks:
-      custom:
+    # networks:
+    #   custom:
   identity-svc:
     image: wkumanuvong/identity-svc:latest
     build:
@@ -83,14 +84,19 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:80
-      - ClientApp=http://app.carauction.com
+      - IssuerUri=http://localhost:5001
+      - ClientApp=http://localhost:3000
+      # - IssuerUri=https://id.carauction.local
+      # - ClientApp=https://app.carauction.local
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;User Id=postgres;Password=admin24!!;Database=identity;Pooling=true
-      - VIRTUAL_HOST=id.carauction.com
+      # - VIRTUAL_HOST=id.carauction.local
+    ports:
+      - 5001:80
     depends_on:
       - postgres
-    networks:
-      custom:
-        ipv4_address: 10.5.0.200
+    # networks:
+    #   custom:
+    #     ipv4_address: 10.5.0.200
   gateway-svc:
     image: wkumanuvong/gateway-svc:latest
     build:
@@ -99,10 +105,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:80
-      - ClientApp=https://app.carauction.com
-      - VIRTUAL_HOST=api.carauction.com
-    networks:
-      custom:
+      # - ClientApp=https://app.carauction.local
+      # - VIRTUAL_HOST=api.carauction.local
+    ports:
+      - 6001:80
+    # networks:
+    #   custom:
   bid-svc:
     image: wkumanuvong/bid-svc:latest
     build:
@@ -120,8 +128,8 @@ services:
     depends_on:
       - mongodb
       - rabbitmq
-    networks:
-      custom:
+    # networks:
+    #   custom:
   notify-svc:
     image: wkumanuvong/notify-svc:latest
     build:
@@ -135,8 +143,8 @@ services:
       - 7004:80
     depends_on:
       - rabbitmq
-    networks:
-      custom:
+    # networks:
+    #   custom:
   web-app:
     image: wkumanuvong/web-app
     build:
@@ -144,27 +152,34 @@ services:
       dockerfile: frontend/web-app/Dockerfile
     volumes:
       - /var/lib/web/data
-    extra_hosts:
-      - id.carauction.com:10.5.0.200
-    environment:
-      - NEXTAUTH_SECRET=somethingreallyreallysecret
-      - CLIENT_SECRET=secret
-      - NEXTAUTH_URL=http://app.carauction.com
-      - NEXTAUTH_URL_INTERNAL=http://web-app:3000
-      - API_URL=http://gateway-svc/
-      - ID_URL=http://id.carauction.com
-      - NEXT_PUBLIC_NOTIFY_URL=http://gateway-svc/notifications
-      - VIRTUAL_HOST=app.carauction.com
-      - VIRTUAL_PORT=3000
-    networks:
-      custom:
-  nginx-proxy:
-    image: nginxproxy/nginx-proxy
+    # extra_hosts:
+    #   - id.carauction.com:10.5.0.200
     ports:
-      - 80:80
-      - 443:443
-    networks:
-      custom:
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./devcerts:/etc/nginx/certs
+      - 3000:3000
+    environment:
+      - AUTH_SECRET="OBuZoHo4m4Dss4+1gGswbHpH1kU+AbzRcy9/PF1VGV0="
+      - AUTH_URL=http://localhost:3000
+      - AUTH_URL_INTERNAL=http://web-app:3000
+      - API_URL=http://gateway-svc/
+      - ID_URL=http://localhost:5001
+      - ID_URL_INTERNAL=http://identity-svc
+      - NOTIFY_URL=http://localhost:6001/notifications
+      # - AUTH_URL=https://app.carauction.local
+      # - ID_URL=http://id.carauction.local
+      # - ID_URL_INTERNAL=http://identity-svc
+      # - NOTIFY_URL=https://api.carauction.local/notifications
+      #    - VIRTUAL_HOST=app.carauction.local
+      #    - VIRTUAL_PORT=3000
+      #   networks:
+      #     custom:
+  # nginx-proxy:
+  #   image: nginxproxy/nginx-proxy
+  #   container_name: nginx-proxy
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   networks:
+  #     custom:
+  #   volumes:
+  #     - /var/run/docker.sock:/tmp/docker.sock:ro
+  #     - ./devcerts:/etc/nginx/certs

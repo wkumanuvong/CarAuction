@@ -16,10 +16,9 @@ const config: Config = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
-  },
-  corePlugin: {
-    aspectRatio: false,
-  },
-  plugins: [require('@tailwindcss/aspect-ratio'), flowbite.plugin()],
+  },  
+  plugins: [
+    flowbite.plugin()
+  ],
 };
 export default config;

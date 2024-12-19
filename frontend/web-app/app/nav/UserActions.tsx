@@ -1,7 +1,7 @@
 'use client';
 
 import { useParamsStore } from '@/hooks/useParamsStore';
-import { Dropdown } from 'flowbite-react';
+import { Dropdown, DropdownDivider, DropdownItem } from 'flowbite-react';
 import { User } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
@@ -31,25 +31,25 @@ export default function UserActions({ user }: Props) {
 
   return (
     <Dropdown label={`Welcome ${user.name}`} inline>
-      <Dropdown.Item icon={HiUser} onClick={setSeller}>
+      <DropdownItem icon={HiUser} onClick={setSeller}>
         My Auctions
-      </Dropdown.Item>
-      <Dropdown.Item icon={AiFillTrophy} onClick={setWinner}>
+      </DropdownItem>
+      <DropdownItem icon={AiFillTrophy} onClick={setWinner}>
         Auctions won
-      </Dropdown.Item>
-      <Dropdown.Item icon={AiFillCar}>
-        <Link href="/auctions/create">Sell my car</Link>
-      </Dropdown.Item>
-      <Dropdown.Item icon={HiCog}>
-        <Link href="/session">Session (dev only)</Link>
-      </Dropdown.Item>
-      <Dropdown.Divider />
-      <Dropdown.Item
+      </DropdownItem>
+      <DropdownItem icon={AiFillCar}>
+        <Link href='/auctions/create'>Sell my car</Link>
+      </DropdownItem>
+      <DropdownItem icon={HiCog}>
+        <Link href='/session'>Session (dev only)</Link>
+      </DropdownItem>
+      <DropdownDivider />
+      <DropdownItem
         icon={AiOutlineLogout}
         onClick={() => signOut({ callbackUrl: '/' })}
       >
         Sign out
-      </Dropdown.Item>
+      </DropdownItem>
     </Dropdown>
   );
 }

@@ -1,6 +1,7 @@
 name: deploy-identity
 
 on:
+  # manual run
   workflow_dispatch:
   push:
     branches: ['main']
